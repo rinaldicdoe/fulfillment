@@ -40,24 +40,24 @@ st.markdown("""
     
     /* Default variables (light theme) */
     :root {
-        --text-color: #1a202c;
+        --text-color: #2d3748;
         --background-color: rgba(248, 250, 252, 0.9);
         --tab-bg: #f8fafc;
         --tab-panel-bg: #ffffff;
-        --instructions-bg: #f8fafc;
-        --instructions-border: #e2e8f0;
-        --instructions-header: #2d3748;
+        --instructions-bg: #ffffff;
+        --instructions-border: #cbd5e0;
+        --instructions-header: #2b6cb0;
     }
     
     /* Light mode explicit */
     [data-theme="light"] {
-        --text-color: #1a202c;
+        --text-color: #2d3748;
         --background-color: rgba(248, 250, 252, 0.9);
         --tab-bg: #f8fafc;
         --tab-panel-bg: #ffffff;
-        --instructions-bg: #f8fafc;
-        --instructions-border: #e2e8f0;
-        --instructions-header: #2d3748;
+        --instructions-bg: #ffffff;
+        --instructions-border: #cbd5e0;
+        --instructions-header: #2b6cb0;
     }
     
     /* Dark mode */
@@ -87,13 +87,13 @@ st.markdown("""
     /* Auto detect theme - Light */
     @media (prefers-color-scheme: light) {
         :root {
-            --text-color: #1a202c;
+            --text-color: #2d3748;
             --background-color: rgba(248, 250, 252, 0.9);
             --tab-bg: #f8fafc;
             --tab-panel-bg: #ffffff;
-            --instructions-bg: #f8fafc;
-            --instructions-border: #e2e8f0;
-            --instructions-header: #2d3748;
+            --instructions-bg: #ffffff;
+            --instructions-border: #cbd5e0;
+            --instructions-header: #2b6cb0;
         }
     }
     
@@ -209,13 +209,13 @@ function updateTheme() {
         root.style.setProperty('--instructions-border', '#4a5568');
         root.style.setProperty('--instructions-header', '#e2e8f0');
     } else {
-        root.style.setProperty('--text-color', '#1a202c');
+        root.style.setProperty('--text-color', '#2d3748');
         root.style.setProperty('--background-color', 'rgba(248, 250, 252, 0.9)');
         root.style.setProperty('--tab-bg', '#f8fafc');
         root.style.setProperty('--tab-panel-bg', '#ffffff');
-        root.style.setProperty('--instructions-bg', '#f8fafc');
-        root.style.setProperty('--instructions-border', '#e2e8f0');
-        root.style.setProperty('--instructions-header', '#2d3748');
+        root.style.setProperty('--instructions-bg', '#ffffff');
+        root.style.setProperty('--instructions-border', '#cbd5e0');
+        root.style.setProperty('--instructions-header', '#2b6cb0');
     }
 }
 
@@ -471,13 +471,9 @@ def main():
             <li><strong>Download Hasil</strong>: Download file Excel gabungan dengan 2 sheet (JNE dan Non JNE)</li>
         </ol>
         
-        <div style="margin-top: 1rem;">
-            <div><strong>📁 Format File Download</strong>: YYYY-MM-DD-HH-Tagihan Fulfillment.xlsx</div>
-        </div>
+        <p style="margin-top: 1rem;"><strong>📁 Format File Download</strong>: YYYY-MM-DD-HH-Tagihan Fulfillment.xlsx</p>
         
-        <div style="margin-top: 1rem;">
-            <div><strong>📝 Catatan</strong>: Verifikasi dilakukan berdasarkan pencocokan nilai di Kolom D file Outgoing dengan Kolom C (Everpro) dan Kolom E (Shopee JNE Surabaya).</div>
-        </div>
+        <p style="margin-top: 1rem;"><strong>📝 Catatan</strong>: Verifikasi dilakukan berdasarkan pencocokan nilai di Kolom D file Outgoing dengan Kolom C (Everpro) dan Kolom E (Shopee JNE Surabaya).</p>
     </div>
     """, unsafe_allow_html=True)
 

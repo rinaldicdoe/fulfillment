@@ -177,17 +177,21 @@ st.markdown("""
     
     .instructions-section p, 
     .instructions-section li, 
-    .instructions-section strong {
+    .instructions-section strong,
+    .instructions-section ul,
+    .instructions-section ol {
         color: var(--text-color) !important;
     }
     
-    .instructions-section ol {
+    .instructions-section ol,
+    .instructions-section ul {
         padding-left: 1.2rem;
     }
     
     .instructions-section li {
         margin-bottom: 0.5rem;
         line-height: 1.6;
+        color: var(--text-color) !important;
     }
 </style>
 
@@ -435,11 +439,15 @@ def main():
             col_center1, col_center2, col_center3 = st.columns([1, 2, 1])
             with col_center2:
                 st.markdown(f"""
-                **Ringkasan Verifikasi:**
-                - JNE: {verified_jne}/{total_jne} data terverifikasi
-                - Non JNE: {verified_non_jne}/{total_non_jne} data terverifikasi
-                - **Total: {verified_jne + verified_non_jne}/{total_jne + total_non_jne} data terverifikasi**
-                """)
+                <div class="instructions-section">
+                    <h3>📊 Ringkasan Verifikasi</h3>
+                    <ul>
+                        <li>JNE: {verified_jne}/{total_jne} data terverifikasi</li>
+                        <li>Non JNE: {verified_non_jne}/{total_non_jne} data terverifikasi</li>
+                        <li><strong>Total: {verified_jne + verified_non_jne}/{total_jne + total_non_jne} data terverifikasi</strong></li>
+                    </ul>
+                </div>
+                """, unsafe_allow_html=True)
                 
                 st.download_button(
                     label="Download Tagihan Fulfillment (Excel)",

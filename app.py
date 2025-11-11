@@ -38,12 +38,20 @@ st.markdown("""
         background-color: var(--background-color);
     }
     
-    /* Light mode */
-    [data-theme="light"] {
-        --text-color: #1a202c;
-        --background-color: rgba(248, 250, 252, 0.8);
+    /* Default variables (light theme) */
+    :root {
+        --text-color: #2d3748;
+        --background-color: rgba(248, 250, 252, 0.9);
         --tab-bg: #f8fafc;
-        --tab-panel-bg: #fafafa;
+        --tab-panel-bg: #ffffff;
+    }
+    
+    /* Light mode explicit */
+    [data-theme="light"] {
+        --text-color: #2d3748;
+        --background-color: rgba(248, 250, 252, 0.9);
+        --tab-bg: #f8fafc;
+        --tab-panel-bg: #ffffff;
     }
     
     /* Dark mode */
@@ -54,7 +62,7 @@ st.markdown("""
         --tab-panel-bg: #1a202c;
     }
     
-    /* Auto detect theme */
+    /* Auto detect theme - Dark */
     @media (prefers-color-scheme: dark) {
         :root {
             --text-color: #f7fafc;
@@ -64,12 +72,13 @@ st.markdown("""
         }
     }
     
+    /* Auto detect theme - Light */
     @media (prefers-color-scheme: light) {
         :root {
-            --text-color: #1a202c;
-            --background-color: rgba(248, 250, 252, 0.8);
+            --text-color: #2d3748;
+            --background-color: rgba(248, 250, 252, 0.9);
             --tab-bg: #f8fafc;
-            --tab-panel-bg: #fafafa;
+            --tab-panel-bg: #ffffff;
         }
     }
     
@@ -126,7 +135,34 @@ st.markdown("""
     }
     
     /* Ensure all text is visible */
-    .stMarkdown p, .stMarkdown li, .stMarkdown span {
+    .stMarkdown p, .stMarkdown li, .stMarkdown span, .stMarkdown div {
+        color: var(--text-color) !important;
+    }
+    
+    /* Force visibility for all markdown content */
+    .stMarkdown, .stMarkdown * {
+        color: var(--text-color) !important;
+    }
+    
+    /* Instructions section styling */
+    .instructions-section {
+        color: var(--text-color) !important;
+        background-color: var(--background-color) !important;
+        padding: 1.5rem;
+        border-radius: 10px;
+        border: 1px solid rgba(124, 58, 237, 0.3);
+        margin: 1rem 0;
+    }
+    
+    .instructions-section h3 {
+        color: #7c3aed !important;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .instructions-section p, 
+    .instructions-section li, 
+    .instructions-section strong {
         color: var(--text-color) !important;
     }
 </style>
@@ -146,10 +182,10 @@ function updateTheme() {
         root.style.setProperty('--tab-bg', '#2d3748');
         root.style.setProperty('--tab-panel-bg', '#1a202c');
     } else {
-        root.style.setProperty('--text-color', '#1a202c');
-        root.style.setProperty('--background-color', 'rgba(248, 250, 252, 0.8)');
+        root.style.setProperty('--text-color', '#2d3748');
+        root.style.setProperty('--background-color', 'rgba(248, 250, 252, 0.9)');
         root.style.setProperty('--tab-bg', '#f8fafc');
-        root.style.setProperty('--tab-panel-bg', '#fafafa');
+        root.style.setProperty('--tab-panel-bg', '#ffffff');
     }
 }
 
@@ -395,17 +431,21 @@ def main():
     
     # Footer
     st.markdown("---")
-    st.markdown("### Petunjuk Penggunaan")
     st.markdown("""
-    1. **Upload File Database**: Upload file Everpro dan/atau Shopee JNE Surabaya sebagai referensi
-    2. **Upload File Verifikasi**: Upload file Outgoing JNE dan/atau Outgoing Non JNE yang akan diverifikasi
-    3. **Proses Verifikasi**: Klik tombol verifikasi untuk memulai pengecekan data
-    4. **Download Hasil**: Download file Excel gabungan dengan 2 sheet (JNE dan Non JNE)
-    
-    **Format File Download**: YYYY-MM-DD-HH-Tagihan Fulfillment.xlsx
-    
-    **Catatan**: Verifikasi dilakukan berdasarkan pencocokan nilai di Kolom D file Outgoing dengan Kolom C (Everpro) dan Kolom E (Shopee JNE Surabaya).
-    """)
+    <div class="instructions-section">
+        <h3>📋 Petunjuk Penggunaan</h3>
+        <ol>
+            <li><strong>Upload File Database</strong>: Upload file Everpro dan/atau Shopee JNE Surabaya sebagai referensi</li>
+            <li><strong>Upload File Verifikasi</strong>: Upload file Outgoing JNE dan/atau Outgoing Non JNE yang akan diverifikasi</li>
+            <li><strong>Proses Verifikasi</strong>: Klik tombol verifikasi untuk memulai pengecekan data</li>
+            <li><strong>Download Hasil</strong>: Download file Excel gabungan dengan 2 sheet (JNE dan Non JNE)</li>
+        </ol>
+        
+        <p><strong>📁 Format File Download</strong>: YYYY-MM-DD-HH-Tagihan Fulfillment.xlsx</p>
+        
+        <p><strong>📝 Catatan</strong>: Verifikasi dilakukan berdasarkan pencocokan nilai di Kolom D file Outgoing dengan Kolom C (Everpro) dan Kolom E (Shopee JNE Surabaya).</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()

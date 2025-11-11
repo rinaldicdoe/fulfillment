@@ -470,10 +470,6 @@ def main():
             <li><strong>Proses Verifikasi</strong>: Klik tombol verifikasi untuk memulai pengecekan data</li>
             <li><strong>Download Hasil</strong>: Download file Excel gabungan dengan 2 sheet (JNE dan Non JNE)</li>
         </ol>
-        
-        <p style="margin-top: 1rem;"><strong>📁 Format File Download</strong>: YYYY-MM-DD-HH-Tagihan Fulfillment.xlsx</p>
-        
-        <p style="margin-top: 1rem;"><strong>📝 Catatan</strong>: Verifikasi dilakukan berdasarkan pencocokan nilai di Kolom D file Outgoing dengan Kolom C (Everpro) dan Kolom E (Shopee JNE Surabaya).</p>
     </div>
     """, unsafe_allow_html=True)
 

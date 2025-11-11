@@ -40,18 +40,24 @@ st.markdown("""
     
     /* Default variables (light theme) */
     :root {
-        --text-color: #2d3748;
+        --text-color: #1a202c;
         --background-color: rgba(248, 250, 252, 0.9);
         --tab-bg: #f8fafc;
         --tab-panel-bg: #ffffff;
+        --instructions-bg: #f8fafc;
+        --instructions-border: #e2e8f0;
+        --instructions-header: #2d3748;
     }
     
     /* Light mode explicit */
     [data-theme="light"] {
-        --text-color: #2d3748;
+        --text-color: #1a202c;
         --background-color: rgba(248, 250, 252, 0.9);
         --tab-bg: #f8fafc;
         --tab-panel-bg: #ffffff;
+        --instructions-bg: #f8fafc;
+        --instructions-border: #e2e8f0;
+        --instructions-header: #2d3748;
     }
     
     /* Dark mode */
@@ -60,6 +66,9 @@ st.markdown("""
         --background-color: rgba(45, 55, 72, 0.8);
         --tab-bg: #2d3748;
         --tab-panel-bg: #1a202c;
+        --instructions-bg: #2d3748;
+        --instructions-border: #4a5568;
+        --instructions-header: #e2e8f0;
     }
     
     /* Auto detect theme - Dark */
@@ -69,16 +78,22 @@ st.markdown("""
             --background-color: rgba(45, 55, 72, 0.8);
             --tab-bg: #2d3748;
             --tab-panel-bg: #1a202c;
+            --instructions-bg: #2d3748;
+            --instructions-border: #4a5568;
+            --instructions-header: #e2e8f0;
         }
     }
     
     /* Auto detect theme - Light */
     @media (prefers-color-scheme: light) {
         :root {
-            --text-color: #2d3748;
+            --text-color: #1a202c;
             --background-color: rgba(248, 250, 252, 0.9);
             --tab-bg: #f8fafc;
             --tab-panel-bg: #ffffff;
+            --instructions-bg: #f8fafc;
+            --instructions-border: #e2e8f0;
+            --instructions-header: #2d3748;
         }
     }
     
@@ -147,15 +162,15 @@ st.markdown("""
     /* Instructions section styling */
     .instructions-section {
         color: var(--text-color) !important;
-        background-color: var(--background-color) !important;
+        background-color: var(--instructions-bg) !important;
         padding: 1.5rem;
         border-radius: 10px;
-        border: 1px solid rgba(124, 58, 237, 0.3);
+        border: 1px solid var(--instructions-border);
         margin: 1rem 0;
     }
     
     .instructions-section h3 {
-        color: #7c3aed !important;
+        color: var(--instructions-header) !important;
         font-weight: 600;
         margin-bottom: 1rem;
     }
@@ -164,6 +179,15 @@ st.markdown("""
     .instructions-section li, 
     .instructions-section strong {
         color: var(--text-color) !important;
+    }
+    
+    .instructions-section ol {
+        padding-left: 1.2rem;
+    }
+    
+    .instructions-section li {
+        margin-bottom: 0.5rem;
+        line-height: 1.6;
     }
 </style>
 
@@ -181,11 +205,17 @@ function updateTheme() {
         root.style.setProperty('--background-color', 'rgba(45, 55, 72, 0.8)');
         root.style.setProperty('--tab-bg', '#2d3748');
         root.style.setProperty('--tab-panel-bg', '#1a202c');
+        root.style.setProperty('--instructions-bg', '#2d3748');
+        root.style.setProperty('--instructions-border', '#4a5568');
+        root.style.setProperty('--instructions-header', '#e2e8f0');
     } else {
-        root.style.setProperty('--text-color', '#2d3748');
+        root.style.setProperty('--text-color', '#1a202c');
         root.style.setProperty('--background-color', 'rgba(248, 250, 252, 0.9)');
         root.style.setProperty('--tab-bg', '#f8fafc');
         root.style.setProperty('--tab-panel-bg', '#ffffff');
+        root.style.setProperty('--instructions-bg', '#f8fafc');
+        root.style.setProperty('--instructions-border', '#e2e8f0');
+        root.style.setProperty('--instructions-header', '#2d3748');
     }
 }
 
@@ -441,9 +471,13 @@ def main():
             <li><strong>Download Hasil</strong>: Download file Excel gabungan dengan 2 sheet (JNE dan Non JNE)</li>
         </ol>
         
-        <p><strong>📁 Format File Download</strong>: YYYY-MM-DD-HH-Tagihan Fulfillment.xlsx</p>
+        <div style="margin-top: 1rem;">
+            <div><strong>📁 Format File Download</strong>: YYYY-MM-DD-HH-Tagihan Fulfillment.xlsx</div>
+        </div>
         
-        <p><strong>📝 Catatan</strong>: Verifikasi dilakukan berdasarkan pencocokan nilai di Kolom D file Outgoing dengan Kolom C (Everpro) dan Kolom E (Shopee JNE Surabaya).</p>
+        <div style="margin-top: 1rem;">
+            <div><strong>📝 Catatan</strong>: Verifikasi dilakukan berdasarkan pencocokan nilai di Kolom D file Outgoing dengan Kolom C (Everpro) dan Kolom E (Shopee JNE Surabaya).</div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 

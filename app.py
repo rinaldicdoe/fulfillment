@@ -237,7 +237,17 @@ def load_excel_file(uploaded_file) -> Optional[pd.DataFrame]:
     """Load Excel file and return DataFrame"""
     try:
         if uploaded_file is not None:
-            return pd.read_excel(uploaded_file)
+            # Force columns C, D, E to be read as string to prevent Excel from converting numbers
+            # This prevents precision loss for long numbers like AWB
+            # Column C (index 2), D (index 3), E (index 4)
+            return pd.read_excel(
+                uploaded_file,
+                dtype={
+                    2: str,  # Column C
+                    3: str,  # Column D  
+                    4: str,  # Column E
+                }
+            )
         return None
     except Exception as e:
         st.error(f"Error loading file: {str(e)}")
@@ -250,6 +260,29 @@ def verify_data(outgoing_df: pd.DataFrame, everpro_df: pd.DataFrame, shopee_df: 
     # Create verification column M
     verification_results = []
     
+    def normalize_value(val):
+        """Normalize value to string for comparison"""
+        if pd.isna(val):
+            return None
+        
+        # Convert to string
+        val_str = str(val).strip()
+        
+        # If it looks like a float with .0, remove the .0
+        # This handles cases like 123.0 -> "123"
+        if '.' in val_str:
+            try:
+                # Try to convert to float
+                float_val = float(val_str)
+                # If it's a whole number (no decimal part), remove .0
+                if float_val.is_integer():
+                    val_str = str(int(float_val))
+            except (ValueError, OverflowError):
+                # If conversion fails, keep original string
+                pass
+        
+        return val_str
+    
     for index, row in outgoing_df.iterrows():
         value_to_check = row.iloc[3] if len(row) > 3 else None  # Column D (index 3)
         
@@ -257,15 +290,26 @@ def verify_data(outgoing_df: pd.DataFrame, everpro_df: pd.DataFrame, shopee_df: 
             verification_results.append("Tidak Terverifikasi")
             continue
         
+        # Normalize the value to check
+        value_to_check_str = normalize_value(value_to_check)
+        
+        if value_to_check_str is None:
+            verification_results.append("Tidak Terverifikasi")
+            continue
+        
         # Check in Everpro (Column C - index 2)
         found_in_everpro = False
         if everpro_df is not None and len(everpro_df.columns) > 2:
-            found_in_everpro = value_to_check in everpro_df.iloc[:, 2].values
+            # Normalize all values in reference column
+            everpro_values = [normalize_value(v) for v in everpro_df.iloc[:, 2].values]
+            found_in_everpro = value_to_check_str in everpro_values
         
         # Check in Shopee JNE Surabaya (Column E - index 4)
         found_in_shopee = False
         if shopee_df is not None and len(shopee_df.columns) > 4:
-            found_in_shopee = value_to_check in shopee_df.iloc[:, 4].values
+            # Normalize all values in reference column
+            shopee_values = [normalize_value(v) for v in shopee_df.iloc[:, 4].values]
+            found_in_shopee = value_to_check_str in shopee_values
         
         # Verification: found in either Everpro OR Shopee (not both required)
         if found_in_everpro or found_in_shopee:
@@ -311,7 +355,7 @@ def main():
     # File upload section with tabs
     st.markdown('<div class="section-header">Upload File Excel</div>', unsafe_allow_html=True)
     
-    tab1, tab2, tab3, tab4 = st.tabs(["Database Everpro", "Shopee JNE Surabaya", "Outgoing JNE", "Outgoing Non JNE"])
+    tab1, tab2, tab3 = st.tabs(["Database Everpro", "Shopee JNE Surabaya", "File Outgoing"])
     
     with tab1:
         st.markdown("### Database Everpro")
@@ -334,24 +378,59 @@ def main():
             st.info(f"📊 Total baris data: {len(st.session_state.shopee_df)}")
     
     with tab3:
-        st.markdown("### Outgoing JNE")
-        st.caption("File Excel dengan kolom sampai L - akan diverifikasi berdasarkan kolom D")
-        outgoing_jne_file = st.file_uploader("Pilih file Excel Outgoing JNE", type=['xlsx', 'xls'], key="outgoing_jne")
-        if outgoing_jne_file:
-            st.session_state.outgoing_jne_df = load_excel_file(outgoing_jne_file)
-            st.session_state.files_uploaded['outgoing_jne'] = True
-            st.success("✅ File Outgoing JNE berhasil diupload")
-            st.info(f"📊 Total baris data: {len(st.session_state.outgoing_jne_df)}")
-    
-    with tab4:
-        st.markdown("### Outgoing Non JNE")
-        st.caption("File Excel dengan kolom sampai L - akan diverifikasi berdasarkan kolom D")
-        outgoing_non_jne_file = st.file_uploader("Pilih file Excel Outgoing Non JNE", type=['xlsx', 'xls'], key="outgoing_non_jne")
-        if outgoing_non_jne_file:
-            st.session_state.outgoing_non_jne_df = load_excel_file(outgoing_non_jne_file)
-            st.session_state.files_uploaded['outgoing_non_jne'] = True
-            st.success("✅ File Outgoing Non JNE berhasil diupload")
-            st.info(f"📊 Total baris data: {len(st.session_state.outgoing_non_jne_df)}")
+        st.markdown("### File Outgoing")
+        st.caption("Upload file Outgoing (bisa multiple files) - sistem akan otomatis mendeteksi JNE atau Non-JNE")
+        
+        # Single uploader that accepts multiple files
+        outgoing_files = st.file_uploader(
+            "Pilih file Excel Outgoing (bisa pilih lebih dari 1 file)", 
+            type=['xlsx', 'xls'], 
+            key="outgoing_files",
+            accept_multiple_files=True
+        )
+        
+        if outgoing_files:
+            # Reset flags
+            st.session_state.files_uploaded['outgoing_jne'] = False
+            st.session_state.files_uploaded['outgoing_non_jne'] = False
+            
+            for uploaded_file in outgoing_files:
+                df = load_excel_file(uploaded_file)
+                if df is not None:
+                    # Auto-detect JNE or Non-JNE based on filename
+                    filename = uploaded_file.name.lower()
+                    
+                    if 'jne' in filename and 'non' not in filename:
+                        # This is JNE file
+                        st.session_state.outgoing_jne_df = df
+                        st.session_state.files_uploaded['outgoing_jne'] = True
+                        st.success(f"✅ **{uploaded_file.name}** - Terdeteksi sebagai Outgoing JNE")
+                        st.info(f"📊 Total baris data: {len(df)}")
+                    elif 'non' in filename or 'non-jne' in filename or 'nonjne' in filename:
+                        # This is Non-JNE file
+                        st.session_state.outgoing_non_jne_df = df
+                        st.session_state.files_uploaded['outgoing_non_jne'] = True
+                        st.success(f"✅ **{uploaded_file.name}** - Terdeteksi sebagai Outgoing Non-JNE")
+                        st.info(f"📊 Total baris data: {len(df)}")
+                    else:
+                        # Cannot auto-detect, ask user
+                        st.warning(f"⚠️ **{uploaded_file.name}** - Tidak dapat mendeteksi tipe otomatis")
+                        file_type = st.radio(
+                            f"Pilih tipe untuk {uploaded_file.name}:",
+                            ["JNE", "Non-JNE"],
+                            key=f"type_{uploaded_file.name}"
+                        )
+                        
+                        if file_type == "JNE":
+                            st.session_state.outgoing_jne_df = df
+                            st.session_state.files_uploaded['outgoing_jne'] = True
+                            st.success(f"✅ File disimpan sebagai Outgoing JNE")
+                            st.info(f"📊 Total baris data: {len(df)}")
+                        else:
+                            st.session_state.outgoing_non_jne_df = df
+                            st.session_state.files_uploaded['outgoing_non_jne'] = True
+                            st.success(f"✅ File disimpan sebagai Outgoing Non-JNE")
+                            st.info(f"📊 Total baris data: {len(df)}")
     
     # Add some spacing
     st.markdown("<br>", unsafe_allow_html=True)

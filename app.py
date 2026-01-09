@@ -268,6 +268,11 @@ def verify_data(outgoing_df: pd.DataFrame, everpro_df: pd.DataFrame, shopee_df: 
         # Convert to string
         val_str = str(val).strip()
         
+        # Remove leading apostrophe that Excel adds for text formatting
+        # Excel uses ' to force a number to be treated as text
+        if val_str.startswith("'"):
+            val_str = val_str[1:]
+        
         # If it looks like a float with .0, remove the .0
         # This handles cases like 123.0 -> "123"
         if '.' in val_str:

@@ -1,5 +1,34 @@
 # Changelog - Sistem Verifikasi Data Excel
 
+## Versi 2.3 - 2026-01-09 (Apostrophe Fix) ✅
+
+### 🔧 Perbaikan: Leading Apostrophe
+
+**MASALAH:**
+
+- Excel menggunakan leading apostrophe (`'`) untuk memaksa angka sebagai text
+- Contoh: `'001798275859` (untuk menjaga leading zero)
+- Pandas membaca dengan apostrophe: `"'001798275859"`
+- Database tidak punya apostrophe: `"001798275859"`
+- Hasil: TIDAK COCOK ❌
+
+**SOLUSI:**
+Strip leading apostrophe dari nilai:
+
+```python
+if val_str.startswith("'"):
+    val_str = val_str[1:]  # Remove first character
+```
+
+**HASIL:**
+
+- ✅ `'001798275859` → `001798275859`
+- ✅ `'311292500061988` → `311292500061988`
+- ✅ Leading zero tetap terjaga
+- ✅ Semua data sekarang cocok!
+
+---
+
 ## Versi 2.2 - 2026-01-09 (Final Fix) ✅
 
 ### 🎯 Perbaikan Utama: Excel Number Precision
